@@ -1,0 +1,41 @@
+# Install anaconda
+wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.5.0-Linux-x86_64.sh
+bash Anaconda2-2.5.0-Linux-x86_64.sh
+source .bashrc
+which python
+conda update conda
+conda update anaconda
+
+# Install other packages
+conda install pyqt
+conda install matplotlib
+conda install flask
+conda install nltk
+ipython -c "import nltk; nltk.download('punkt')"
+ipython -c "import nltk; nltk.download('stopwords')"
+
+conda install -c https://conda.anaconda.org/hugo flask-bootstrap
+conda install -c https://conda.anaconda.org/flynn tmux
+conda install boto3
+conda install postgresql
+conda install pymongo
+conda install sqlalchemy
+conda install psycopg2
+
+
+# Configure jupyter notebook
+jupyter notebook --generate-config
+
+# Create folders
+mkdir data
+mkdir code
+mkdir web_app
+mkdir -p api/keys
+mkdir -p psql/data
+
+# Initialize Database
+initdb -D psql/data
+createdb
+
+# delete file
+rm Anaconda2-2.5.0-Linux-x86_64.sh
