@@ -5,6 +5,10 @@ import socket
 import time
 from datetime import datetime
 import numpy as np 
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+from MoviePosters import MoviePosters
+import urllib
 
 app = Flask(__name__)
 PORT = 5353
@@ -25,6 +29,16 @@ tree_feature = modelfiles['arr_2']
 tree_threshold = modelfiles['arr_3']
 tree_value = valuefiles.tolist().toarray()
 
+
+
+def question_type(X):
+    idx = np.random.randint(0,3)
+    question1 = 'Is this a movie about %s?' %(X)
+    question2 = 'I think this movie talks about %s.' %(X)
+    question3 = 'Hmmm, does this movie has the story of %s?'%(X)
+    question_list = [question1,question2,question3]
+    return question_list[idx]
+
 def next_feature_threshold_left_right_child(current_idx, tree_left = tree_children_left, tree_right = tree_children_right,\
                                             feature = tree_feature, threshold = tree_threshold):
     left_idx = tree_left[current_idx]
@@ -43,7 +57,8 @@ def movie_guess(X = feature_list, column_names = movie_list, idx = 0):
 
     if request.method == 'GET':
         prediction = X[feature_idx]
-        return render_template('movie.html',prediction=prediction)
+        question = 'Is this a movie about %s?' %(X[feature_idx])
+        return render_template('movie.html',prediction=question)
 
     if request.method == 'POST':
         return_answer = request.get_json()['answer']
@@ -57,34 +72,19 @@ def movie_guess(X = feature_list, column_names = movie_list, idx = 0):
         ans = tree_value[idx]
         if sum(ans) == 1:
             for index, n in enumerate(ans):
-                if n == 1: 
-                    return jsonify({ 'my_guess': column_names[index] })
+                if n == 1:
+                    req = MoviePosters()
+                    title = column_names[index].split('(')[0]
+                    req.imdb_id_from_title(title)
+                    poster_url = req.get_poster_url() 
+                    print poster_url
+                    return jsonify({ 'my_guess': column_names[index],'poster_url': poster_url})
             # column_names[index]
-        return jsonify({ 'question': X[feature_idx], 'left_idx': updated_left_idx, 'right_idx': updated_right_idx})
-        # 'Is the movie has the element of %s [True/False]:' %(X[feature_idx])        
-
-    # ''' Compute the expected gain from splitting the data along all possible
-    #    values of feature. '''
-    # feature_idx, threshold, left_idx, right_idx = next_feature_threshold_left_right_child(idx)
-    # ans = tree_value[idx]
-    # if sum(ans) <= 10:
-    #     for index, n in enumerate(ans):
-    #         if n == 1: print column_names[index]
-    #     if feature_idx < 0: 
-    #         return 'DONE'
-    #     print 'Keep going! The machine has', int(sum(ans)), 'movies left'
-    #     return 'Is the movie has the element of %s [True/False]:' %(X[feature_idx])
-    # else:
-    #     return 'Is the movie has the element of %s [True/False]:' %(X[feature_idx])
-
-
-    # user_input = str(raw_input())
-    # if user_input == 'F':
-    #     idx = left_idx
-    # elif user_input == 'T':
-    #     idx = right_idx
-    # else: print'errrrrror'
-    # return movie_guess(X, column_names, idx = idx)
+        if X[feature_idx].isupper():
+            question = 'Is this a movie about %s?' %(X[feature_idx])
+        else: 
+            question = question_type(X[feature_idx])
+        return jsonify({ 'question': question, 'left_idx': updated_left_idx, 'right_idx': updated_right_idx})        
 
 if __name__ == '__main__':
     # Register for pinging service
