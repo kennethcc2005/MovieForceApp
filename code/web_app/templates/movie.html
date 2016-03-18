@@ -23,7 +23,7 @@
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/<li></li>bs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.3/respond.min.js"></script>
     <![endif]-->
 
@@ -54,6 +54,14 @@
             <div id="movieGuess">
                 <div class="row">
                     <h1></h1>
+                    <div class="row">
+                        <img id="moviePoster" src="#" height="428" width="285"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div id="the-basic-search">
+                    <input id="movie-search" class="typeahead" type="text" placeholder="The correct movie">
                 </div>
             </div>
         </main>
@@ -64,13 +72,18 @@
 
     <!-- jQuery -->
     <script src="../static/js/jquery.js"></script>
+
     <!-- Bootstrap Core JavaScript -->
     <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/typeahead.jquery.js"></script>
 
     <script type="text/javascript">
         $(function(){
             var left_idx = 1,
-                right_idx = 6100;
+                right_idx = 6100,
+                userInputValue = '',
+                movieResponses;
+
             $('.answerBtn').click(function(){
                 var postData = {
                     answer: $(this).text(),
@@ -91,22 +104,20 @@
                     }else if(response.my_guess){
                         $('#movieBox').css('display', 'none');
                         $('h1').text(response.my_guess);
-                        document.getElementById('btn').onclick = function() {
-                            var val = document.getElementById('imagename').value,
-                            src = response.poster_url,
-                            img = document.createElement('img');
-                            img.src = src;
-                            document.body.appendChild(img);
-                        }
-                        $('#btn').on('click', function() {
-                            var img = $('<img />', {src : response.poster_url});
-                            img.appendTo('body');
-                        });
+                        $('#moviePoster').css('display', 'block');
+                        $('#moviePoster').attr('src', response.poster_url);
+                        // $('#the-basic-search').css('display', 'block');
+
                     }else{
                         console.log("Oops, I think your movie is still in production");
                     }
-                })
-            })
+                });
+
+
+            });
+
+
+
         });
     </script>
 

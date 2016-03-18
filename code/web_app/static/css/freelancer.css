@@ -8,3 +8,11 @@
     margin: 50px auto;
     height: 100px;
 }
+
+#moviePoster {
+    display: none;
+}
+
+#the-basic-search {
+    display: none;
+}

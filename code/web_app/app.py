@@ -29,13 +29,22 @@ tree_feature = modelfiles['arr_2']
 tree_threshold = modelfiles['arr_3']
 tree_value = valuefiles.tolist().toarray()
 
+def fuzzy_search(user_search):
+    search_tuple = process.extract(user_search, choices, limit=5)
+    result = [i[0] for i in search_tuple]
+    return result
 
+def movie_poster(title):
+    req = MoviePosters()
+    req.imdb_id_from_title(title)
+    poster_url = req.get_poster_url()     
+    return poster_url
 
 def question_type(X):
     idx = np.random.randint(0,3)
     question1 = 'Is this a movie about %s?' %(X)
     question2 = 'I think this movie talks about %s.' %(X)
-    question3 = 'Hmmm, does this movie has the story of %s?'%(X)
+    question3 = 'Hmmm, does this movie has the element of %s?'%(X)
     question_list = [question1,question2,question3]
     return question_list[idx]
 
@@ -51,6 +60,14 @@ def next_feature_threshold_left_right_child(current_idx, tree_left = tree_childr
 def index():
     return render_template('index.html')
 
+# @app.route('/search', methods=['POST'])
+# def searchMovie():
+    #  => ''
+    # search_tuple = process.extract(request.get_data(), choices, limit=5)
+    # result = [i[0] for i in search_tuple]
+    # return result
+
+
 @app.route('/movie_question', methods=['GET', 'POST'])
 def movie_guess(X = feature_list, column_names = movie_list, idx = 0):
     feature_idx, threshold, left_idx, right_idx = next_feature_threshold_left_right_child(idx)
@@ -65,26 +82,33 @@ def movie_guess(X = feature_list, column_names = movie_list, idx = 0):
         last_left_idx = request.get_json()['left_idx']
         last_right_idx = request.get_json()['right_idx']
         if return_answer == 'TRUE':
-            idx = last_left_idx
-        else: 
             idx = last_right_idx
+        else: 
+            idx = last_left_idx
         feature_idx, threshold, updated_left_idx, updated_right_idx = next_feature_threshold_left_right_child(idx)
         ans = tree_value[idx]
         if sum(ans) == 1:
             for index, n in enumerate(ans):
                 if n == 1:
-                    req = MoviePosters()
                     title = column_names[index].split('(')[0]
-                    req.imdb_id_from_title(title)
-                    poster_url = req.get_poster_url() 
+                    poster_url = movie_poster(title)
+                    system_movie = column_names[index]
                     print poster_url
-                    return jsonify({ 'my_guess': column_names[index],'poster_url': poster_url})
+                    return jsonify({ 'my_guess': system_movie,'poster_url': poster_url})
             # column_names[index]
         if X[feature_idx].isupper():
             question = 'Is this a movie about %s?' %(X[feature_idx])
         else: 
             question = question_type(X[feature_idx])
         return jsonify({ 'question': question, 'left_idx': updated_left_idx, 'right_idx': updated_right_idx})        
+
+@app.route('/movie_features', methods=['GET', 'POST'])
+def movie_features(system_movie, user_movie):
+    if request.method == 'GET':
+        prediction = X[feature_idx]
+        question = 'Is this a movie about %s?' %(X[feature_idx])
+        return render_template('movie.html',prediction=question)    
+
 
 if __name__ == '__main__':
     # Register for pinging service

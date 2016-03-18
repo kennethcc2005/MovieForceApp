@@ -10,7 +10,7 @@ class  MoviePosters(object):
         self.key = key
         self.base_url = base_url
         self.max_size = max_size
-        self.movie_id = None
+        self.imdbid = 0
 
     def imdb_id_from_title(self,title):
         """ return IMDB id for search string
@@ -34,15 +34,21 @@ class  MoviePosters(object):
                 self.imdbid = res[key][0]['id']
                 return res[key][0]['id']
 
+
     def get_poster_url(self):
-        IMG_PATTERN = 'http://api.themoviedb.org/3/movie/{imdbid}/images?api_key={key}' 
+        IMG_PATTERN = 'http://api.themoviedb.org/3/movie/{imdbid}/images?api_key={key}'
         r = requests.get(IMG_PATTERN.format(key=self.key,imdbid=self.imdbid))
         api_response = r.json()
-        base_url =  "http://image.tmdb.org/t/p/"
-        max_size = 'original'
-        posters = api_response['posters']
-        # poster_urls = []
-        # for poster in posters:
-        rel_path = posters[0]['file_path']
-        url = "{0}{1}{2}".format(base_url, max_size, rel_path)
-        return url
+        # if api_response['status_code'] == 34:
+        #     return 0 
+        try: 
+            posters = api_response['posters']
+            # poster_urls = []
+            # for poster in posters:
+            rel_path = posters[0]['file_path']
+            url = "{0}{1}{2}".format(self.base_url, self.max_size, rel_path)
+            return url
+        except IndexError:
+            return 0 
+        except KeyError:
+            return 0 
