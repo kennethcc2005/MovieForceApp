@@ -26,8 +26,8 @@ def movie_poster(title):
 
 def all_posters(save_path, movie_list = movie_list):
     posters_url = []
-    i =0 
-    for name in movie_list[:1000]:
+    i =5000 
+    for name in movie_list[5000:]:
         i += 1
         title = name.split('(')[-2].replace(r")","")
         title = ''.join(ch for ch in title if ch not in exclude)

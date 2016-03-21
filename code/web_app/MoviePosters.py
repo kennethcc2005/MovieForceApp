@@ -23,17 +23,19 @@ class  MoviePosters(object):
                 None. If no match was found
 
         """
-        pattern = 'http://www.imdb.com/xml/find?json=1&nr=1&tt=on&q={movie_title}'
-        url = pattern.format(movie_title=urllib.quote(title))
-        r = requests.get(url)
-        res = r.json()
-        # sections in descending order or preference
-        for section in ['popular','exact','substring']:
-            key = 'title_' + section 
-            if key in res:
-                self.imdbid = res[key][0]['id']
-                return res[key][0]['id']
-
+        try:
+            pattern = 'http://www.imdb.com/xml/find?json=1&nr=1&tt=on&q={movie_title}'
+            url = pattern.format(movie_title=urllib.quote(title))
+            r = requests.get(url)
+            res = r.json()
+            # sections in descending order or preference
+            for section in ['popular','exact','substring']:
+                key = 'title_' + section 
+                if key in res:
+                    self.imdbid = res[key][0]['id']
+                    return res[key][0]['id']
+        except ValueError:
+            return 0
 
     def get_poster_url(self):
         IMG_PATTERN = 'http://api.themoviedb.org/3/movie/{imdbid}/images?api_key={key}'

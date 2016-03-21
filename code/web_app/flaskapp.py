@@ -5,8 +5,8 @@ import socket
 import time
 from datetime import datetime
 import numpy as np 
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+# from fuzzywuzzy import fuzz
+# from fuzzywuzzy import process
 from MoviePosters import MoviePosters
 import urllib
 
@@ -16,9 +16,9 @@ DATA = []
 TIMESTAMP = []
 
 # clf = joblib.load('my_movie_model20_v10.pkl')
-moviefiles = np.load('../../data/feature_movie_name.npz')
-modelfiles = np.load('../../data/my_movie_model20_10_array.npz')
-valuefiles = np.load('../../data/my_movie_model20_10_value.npy')
+moviefiles = np.load('data/feature_movie_name.npz')
+modelfiles = np.load('data/my_movie_model20_10_array.npz')
+valuefiles = np.load('data/my_movie_model20_10_value.npy')
 
 feature_list = moviefiles['arr_1']
 movie_list = moviefiles['arr_0']
