@@ -9,6 +9,7 @@ import numpy as np
 # # from fuzzywuzzy import process
 from MoviePosters import MoviePosters
 import urllib
+import scipy
 
 app = Flask(__name__)
 
