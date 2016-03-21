@@ -1,0 +1,6 @@
+fuzzywuzzy == 0.10.0
+pandas == 0.17.1
+requests == 2.8.1
+Flask == 0.10.1
+numpy == 1.11.0rc2
+scikit_learn == 0.17.1
