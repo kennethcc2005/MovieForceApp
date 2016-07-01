@@ -7,9 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="author" content=""> 
 
-    <title>😀 Emoji Predictor</title>
+    <title>😀 Movie Force</title>
 
     <!-- Bootstrap Core CSS - Uses Bootswatch Flatly Theme: http://bootswatch.com/flatly/ -->
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
@@ -33,17 +33,38 @@
 <body>
     <div class="container-fluid">
         <header>
-
         </header>
         <main>
-            <div class="row"> 
-                <div class="col-md-4 col-md-offset-4">
-                    <a href="/movie_question"><button type="button" class="btn btn-success btn-lg">PLAY</button></a>
-                </div>
+            <div class="message" style="margin-top:200px;">
+              <h2><a href="/movie_question"><button type="button" class="btn btn-success btn-lg">PLAY</button></a></h2>
             </div>
         </main>
         <footer>
 
+            <div class="sand"></div>
+            <div class="bb8">
+              <div class="antennas">
+                <div class="antenna short"></div>
+                <div class="antenna long"></div>
+              </div>
+              <div class="head">
+                <div class="stripe one"></div>
+                <div class="stripe two"></div>
+                <div class="eyes">
+                  <div class="eye one"></div>
+                  <div class="eye two"></div>
+                </div>
+                <div class="stripe three"></div>
+              </div>
+              <div class="ball">
+                <div class="lines one"></div>
+                <div class="lines two"></div>
+                <div class="ring one"></div>
+                <div class="ring two"></div>
+                <div class="ring three"></div>
+              </div>
+              <div class="shadow"></div>
+            </div>
         </footer>
     </div>
 
@@ -52,6 +73,77 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../static/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+        var $w = $( window ).width();
+        var $dW = $('.bb8').css('width');
+        $dW = $dW.replace('px', '');
+        $dW = parseInt($dW);
+        var $dPos = 0;
+        var $dSpeed = 1;
+        var $dMinSpeed = 1;
+        var $dMaxSpeed = 4;
+        var $dAccel = 1.04;
+        var $dRot = 0;
+        var $mPos = $w - $w/5;
+        var $slowOffset = 120;
+        var $movingRight = false;
+
+        function moveDroid(){
+          if($mPos > $dPos + ($dW/4)){
+            // moving right
+            if(!$movingRight){
+              $movingRight = true;
+              $('.antennas').addClass('right');
+              $('.eyes').addClass('right');
+            }
+            if($mPos - $dPos > $slowOffset){
+              if($dSpeed < $dMaxSpeed){
+                // speed up
+                $dSpeed = $dSpeed * $dAccel;
+              }
+            } else if($mPos-$dPos < $slowOffset){
+              if($dSpeed > $dMinSpeed){
+                // slow down
+                $dSpeed = $dSpeed / $dAccel;
+              }
+            }
+            $dPos = $dPos + $dSpeed;
+            $dRot = $dRot + $dSpeed;
+          } else if($mPos < $dPos - ($dW/4)){
+            // moving left
+            if($movingRight){
+              $movingRight = false;
+              $('.antennas').removeClass('right');
+              $('.eyes').removeClass('right');
+            }
+            if($dPos - $mPos > $slowOffset){
+              if($dSpeed < $dMaxSpeed){
+                // speed up
+                $dSpeed = $dSpeed * $dAccel;
+              }
+            } else if($dPos - $mPos < $slowOffset){
+              if($dSpeed > $dMinSpeed){
+                // slow down
+                $dSpeed = $dSpeed / $dAccel;
+              }
+            }
+            $dPos = $dPos - $dSpeed;
+            $dRot = $dRot - $dSpeed;
+          } else { }
+          $('.bb8').css('left', $dPos);
+          $('.ball').css({ WebkitTransform: 'rotate(' + $dRot + 'deg)'});
+          $('.ball').css({ '-moz-transform': 'rotate(' + $dRot + 'deg)'});
+        }
+
+        setInterval(moveDroid, 10);
+
+        $( document ).on( "mousemove", function( event ) {
+          $mPos = event.pageX;
+          return $mPos;
+        });
+
+    </script>
 
 </body>
 
