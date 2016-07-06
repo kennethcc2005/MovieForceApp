@@ -87,3 +87,4 @@ ENV/
 # python pickle file
 .pkl
 *.*.npy
+.DS_Store
