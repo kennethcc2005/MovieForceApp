@@ -19,6 +19,7 @@
 
     <!-- Custom Fonts -->
     <link href="../static/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/loading_bb.css" rel="stylesheet" type="text/css" >
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -51,9 +52,18 @@
                     </div>
                 </div>
             </div>
-            <div id="movieGuess">
+            <div id="movieGuess" style="display:none;">
                 <div class="row">
                     <h1></h1>
+                    <h3>Is this the movie you are thinking?</h3>
+                    <div class="row">
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-xs-offset-3 col-sm-offset-3 col-md-offset-3">
+                            <a href="/"><button class="btn btn-success btn-lg">TRUE</button></a>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-3">
+                            <button class="btn btn-success btn-lg newGuessBtn">FALSE</button>
+                        </div>
+                    </div>
                     <div class="row">
                         <img id="moviePoster" src="#" height="428" width="285" style="margin: 100px auto;"/>
                     </div>
@@ -63,6 +73,83 @@
                 <div id="the-basic-search">
                     <input id="movie-search" class="typeahead" type="text" placeholder="The correct movie">
                 </div>
+            </div>
+            <div class="artboard">
+              <div class="bb8">
+                <div class="bb8-body">
+                  <div class="dot dot-1">
+                    <div class="line line-1"></div>
+                    <div class="line line-2"></div>
+                    <div class="line line-3"></div>
+                  </div>
+                  <div class="dot dot-2"></div>
+                  <div class="circle circle-1"></div>
+                  <div class="circle circle-2"></div>
+                  <div class="circle circle-3"></div>
+                </div>
+                <div class="body-shadow-crop"> 
+                  <div class="body-shadow"></div>
+                </div>
+                <div class="bb8-head">
+                  <div class="head-bottom">
+                    <div class="head-side-1"></div>
+                    <div class="head-side-2"></div>
+                    <div class="head-bottom-base"></div>
+                  </div>
+                  <div class="head-top-crop">
+                    <div class="head-top"></div>
+                  </div>
+                  <div class="lens"></div>
+                  <div class="freckle"></div>
+                </div>
+                <div class="speedlines">
+                  <div class="one tail"></div>
+                  <div class="two tail"></div>
+                  <div class="three"></div>
+                  <div class="four"></div>
+                  <div class="five tail"></div>
+                </div>
+                <div class="sparkles">
+                  <div class="one small pulse-1"></div>
+                  <div class="two blue small pulse-2"></div>
+                  <div class="three blue med pulse-3"></div>
+                  <div class="four orange pulse-2"></div>
+                  <div class="five orange pulse-1"></div>
+                  <div class="six blue small pulse"></div>
+                  <div class="seven blue small pulse"></div>
+                  <div class="eight small pulse-3"></div>
+                  <div class="nine pulse"></div>
+                  <div class="ten orange small-1 pulse"></div>
+                  <div class="eleven small pulse"></div>
+                  <div class="twelve small pulse-2"></div>
+                  <div class="thirteen orange small pulse"></div>
+                  <div class="fourteen orange med pulse-3"></div>
+                  <div class="fifteen small pulse-1"></div>
+                  <div class="sixteen small pulse"></div>
+                </div>
+                <div class="ground">
+                  <div class="one">
+                    <div class="bump move-1"></div>
+                  </div>
+                  <div class="two"></div>
+                  <div class="three">
+                    <div class="bump move-2"></div>
+                  </div>
+                  <div class="four">
+                    <div class="bump"></div>
+                  </div>
+                  <div class="five"></div>
+                  <div class="six">
+                    <div class="bump move-2"></div>
+                  </div>
+                  <div class="seven">
+                    <div class="bump"></div>
+                  </div>
+                  <div class="eight">
+                    <div class="bump move-1"></div>
+                  </div>
+                </div>
+              </div>
             </div>
         </main>
         <footer>
@@ -102,17 +189,32 @@
 
     <script type="text/javascript">
         $(function(){
+            if(sessionStorage.getItem('flask_movie_answers') || sessionStorage.getItem('flask_movie_features')){
+                sessionStorage.setItem('flask_movie_features', '');
+                sessionStorage.setItem('flask_movie_answers', '');
+            }
             var left_idx = 1,
                 right_idx = 6100,
                 userInputValue = '',
                 movieResponses;
 
             $('.answerBtn').click(function(){
+                console.log('----')
+                console.log(left_idx)
                 var postData = {
                     answer: $(this).text(),
                     left_idx: left_idx,
-                    right_idx: right_idx
+                    right_idx: right_idx,
+                    use_new_model : sessionStorage.getItem('flask_new_model')
                 }
+
+                if(!sessionStorage.getItem('flask_movie_answers')){
+                    sessionStorage.setItem('flask_movie_answers', '');
+                }
+                var answers = sessionStorage.getItem('flask_movie_answers');
+                answers += postData.answer + ',';
+                sessionStorage.setItem('flask_movie_answers', answers);
+                // $('.artboard').css('display', 'block');
                 $.ajax({
                     type: 'POST',
                     url: '/movie_question',
@@ -120,12 +222,20 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json"
                 }).done(function(response){
+                    // $('.artboard').css('display', 'none');
                     if(response.question){
                         $('#movieFeature').text(response.question);
                         left_idx = response.left_idx;
                         right_idx = response.right_idx;
+                        if(!sessionStorage.getItem('flask_movie_features')){
+                            sessionStorage.setItem('flask_movie_features','');
+                        }
+                        var features = sessionStorage.getItem('flask_movie_features');
+                        features += response.movie_feature + ',';
+                        sessionStorage.setItem('flask_movie_features', features);
                     }else if(response.my_guess){
                         $('#movieBox').css('display', 'none');
+                        $('#movieGuess').css('display', 'block');
                         $('h1').text(response.my_guess);
                         $('#moviePoster').css('display', 'block');
                         $('#moviePoster').attr('src', response.poster_url);
@@ -139,12 +249,50 @@
 
             });
 
-
+            $('.newGuessBtn').click(function(){
+              sessionStorage.setItem('flask_new_model', 'TRUE');
+                var payload = {
+                    movie_features: sessionStorage.getItem('flask_movie_features'),
+                    user_answers: sessionStorage.getItem('flask_movie_answers'),
+                    use_new_model: 'TRUE'
+                }
+                $('.artboard').css('display', 'block');
+                $('footer').css('display', 'none');
+                $.ajax({
+                    type: 'POST',
+                    url: '/new_guess',
+                    data: JSON.stringify(payload),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                }).done(function(data){
+                    $('.artboard').css('display', 'none');
+                    $('footer').css('display', 'block');
+                    sessionStorage.setItem('flask_movie_features', '');
+                    sessionStorage.setItem('flask_movie_answers', '');
+                    $('#movieGuess').css('display', 'none');
+                    $('#movieBox').css('display', 'block');
+                    if(data.status == 200) {
+                        $('#movieFeature').text(data.question);
+                        left_idx = data.left_idx;
+                        console.log(left_idx)
+                        right_idx = data.right_idx;
+                        if(!sessionStorage.getItem('flask_movie_features')){
+                            sessionStorage.setItem('flask_movie_features','');
+                        }
+                        var features = sessionStorage.getItem('flask_movie_features');
+                        features += data.movie_feature + ',';
+                        sessionStorage.setItem('flask_movie_features', features);    
+                    }
+                    if(data.status == 400){
+                        $('#movieFeature').text(data.error);
+                    }
+                });
+            })
 
         });
 
         var $w = $( window ).width();
-        var $dW = $('.bb8').css('width');
+        var $dW = $('footer .bb8').css('width');
         $dW = $dW.replace('px', '');
         $dW = parseInt($dW);
         var $dPos = 0;
@@ -199,7 +347,7 @@
             $dPos = $dPos - $dSpeed;
             $dRot = $dRot - $dSpeed;
           } else { }
-          $('.bb8').css('left', $dPos);
+          $('footer .bb8').css('left', $dPos);
           $('.ball').css({ WebkitTransform: 'rotate(' + $dRot + 'deg)'});
           $('.ball').css({ '-moz-transform': 'rotate(' + $dRot + 'deg)'});
         }

@@ -36,7 +36,7 @@
         </header>
         <main>
             <div class="message" style="margin-top:200px;">
-              <h2><a href="/movie_question"><button type="button" class="btn btn-success btn-lg">PLAY</button></a></h2>
+              <h2><a href="/movie_question"><button type="button" class="btn btn-success btn-lg" onclick="sessionStorage.setItem('flask_new_model', 'FALSE');">PLAY</button></a></h2>
             </div>
         </main>
         <footer>
@@ -75,6 +75,7 @@
     <script src="../static/js/bootstrap.min.js"></script>
 
     <script type="text/javascript">
+        sessionStorage.setItem('flask_new_model', 'FALSE');
         var $w = $( window ).width();
         var $dW = $('.bb8').css('width');
         $dW = $dW.replace('px', '');
